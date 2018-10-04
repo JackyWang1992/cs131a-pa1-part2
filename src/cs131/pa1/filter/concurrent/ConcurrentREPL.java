@@ -32,8 +32,9 @@ public class ConcurrentREPL {
                     cur = (ConcurrentFilter) cur.getNext();
                     cur.setPrevThread(t);
                 }
-
+                
                 Thread printThread = new Thread(cur);
+                printThread.start();
                 try {printThread.join();} catch (InterruptedException e ) {}
 
 //				while(filterlist != null) {

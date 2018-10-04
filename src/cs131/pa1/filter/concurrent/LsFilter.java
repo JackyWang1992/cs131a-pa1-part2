@@ -24,4 +24,12 @@ public class LsFilter extends ConcurrentFilter{
 	public String processLine(String line) {
 		return flist[counter++].getName();
 	}
+	
+	@Override
+	public boolean isDone() {
+		if (prevThread == null) {
+			return flist.length == 0;
+		}
+		return prevThread.isAlive() && flist.length ==0;
+	}
 }
