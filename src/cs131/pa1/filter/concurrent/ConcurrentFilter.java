@@ -54,9 +54,9 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
 	@Override
 	public boolean isDone() {
 		if (prevThread == null) {
-			return input.size() == 0;
+			return input == null || input.size() == 0;
 		}
-		return !(prevThread.getState().equals("TERMINATED"))&& input.size() == 0;
+		return (prevThread.getState().equals("TERMINATED")) && input.size() == 0;
 	}
 
 	protected abstract String processLine(String line);
