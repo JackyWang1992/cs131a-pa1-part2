@@ -23,4 +23,17 @@ public class GrepFilter extends ConcurrentFilter {
 			return null;
 		}
 	}
+	
+	@Override
+	public boolean isDone() {
+		if (prevThread == null) {
+			return input.size() == 0;
+		} else {
+			System.out.print("grep:");
+			System.out.print(!prevThread.isAlive() + "   ");
+			System.out.print((input.size() == 0) + "\n");
+			return !prevThread.isAlive() && input.size() == 0;
+		}
+
+	}
 }
