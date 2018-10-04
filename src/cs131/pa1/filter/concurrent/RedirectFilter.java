@@ -30,9 +30,9 @@ public class RedirectFilter extends ConcurrentFilter {
 		}
 	}
 	
-	public void process() {
+	public void process() throws InterruptedException {
 		while(!isDone()) {
-			processLine(input.poll());
+			processLine(input.take());
 		}
 	}
 	

@@ -5,9 +5,9 @@ public class PrintFilter extends ConcurrentFilter {
 		super();
 	}
 	
-	public void process() {
+	public void process() throws InterruptedException {
 		while(!isDone()) {
-			processLine(input.poll());
+			processLine(input.take());
 		}
 	}
 	

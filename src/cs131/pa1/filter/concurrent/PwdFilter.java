@@ -5,8 +5,8 @@ public class PwdFilter extends ConcurrentFilter {
 		super();
 	}
 	
-	public void process() {
-		output.add(processLine(""));
+	public void process() throws InterruptedException {
+		output.put(processLine(""));
 	}
 	
 	public String processLine(String line) {

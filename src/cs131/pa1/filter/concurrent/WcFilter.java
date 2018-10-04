@@ -9,9 +9,9 @@ public class WcFilter extends ConcurrentFilter {
 		super();
 	}
 	
-	public void process() {
+	public void process() throws InterruptedException {
 		if(isDone()) {
-			output.add(processLine(null));
+			output.put(processLine(null));
 		} else {
 			super.process();
 		}

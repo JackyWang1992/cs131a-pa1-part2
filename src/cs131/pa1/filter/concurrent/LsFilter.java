@@ -14,9 +14,9 @@ public class LsFilter extends ConcurrentFilter{
 	}
 	
 	@Override
-	public void process() {
-		while(counter < flist.length) {
-			output.add(processLine(""));
+	public void process() throws InterruptedException {
+		while(!isDone() && counter < flist.length) {
+			output.put(processLine(""));
 		}
 	}
 	
