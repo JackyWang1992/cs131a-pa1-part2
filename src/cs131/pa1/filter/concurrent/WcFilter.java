@@ -38,13 +38,4 @@ public class WcFilter extends ConcurrentFilter {
 			return null;
 		}
 	}
-	
-	public boolean isDone() {
-		if (prevThread == null) {
-			return input.isEmpty();
-		} else {
-			return !prevThread.isAlive() && input.isEmpty();
-		}
-
-	}
 }
