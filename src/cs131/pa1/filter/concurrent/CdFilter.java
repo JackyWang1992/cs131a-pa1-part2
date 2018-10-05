@@ -33,8 +33,9 @@ public class CdFilter extends ConcurrentFilter {
 		}
 	}
 	
-	public void process() {
+	public void process() throws InterruptedException {
 		processLine("");
+		output.put(POISON_PILL);
 	}
 	
 	public String processLine(String line) {
