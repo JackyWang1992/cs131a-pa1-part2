@@ -9,7 +9,8 @@ import cs131.pa1.filter.Message;
 
 public class RedirectFilter extends ConcurrentFilter {
 	private FileWriter fw;
-	
+	private String line = "";
+
 	public RedirectFilter(String line) throws Exception {
 		super();
 		String[] param = line.split(">");
@@ -31,8 +32,10 @@ public class RedirectFilter extends ConcurrentFilter {
 	}
 	
 	public void process() throws InterruptedException {
+		line = input.take();
 		while(!isDone()) {
-			processLine(input.take());
+			processLine(line);
+			line = input.take();
 		}
 	}
 	
@@ -47,5 +50,9 @@ public class RedirectFilter extends ConcurrentFilter {
 			System.out.printf(Message.FILE_NOT_FOUND.toString(), line);
 		}
 		return null;
+	}
+
+	public boolean isDone() {
+		return line.equals(POISON_PILL);
 	}
 }

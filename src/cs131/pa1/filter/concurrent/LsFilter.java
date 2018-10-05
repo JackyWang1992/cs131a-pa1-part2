@@ -14,10 +14,11 @@ public class LsFilter extends ConcurrentFilter{
 	}
 	
 	@Override
-	public void process() {
+	public void process() throws InterruptedException {
 		while(counter < flist.length) {
 			output.add(processLine(""));
 		}
+		output.put(POISON_PILL);
 	}
 	
 	@Override

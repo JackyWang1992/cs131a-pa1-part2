@@ -1,12 +1,8 @@
 package cs131.pa1.filter.concurrent;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import cs131.pa1.filter.Filter;
-
-import static java.lang.Thread.State.TERMINATED;
 
 
 public abstract class ConcurrentFilter extends Filter implements Runnable {
@@ -14,6 +10,7 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
     protected LinkedBlockingQueue<String> input;
     protected LinkedBlockingQueue<String> output;
     protected static final String POISON_PILL = "END OF THREAD";
+    protected String line = "";
 
     @Override
     public void setPrevFilter(Filter prevFilter) {
@@ -27,7 +24,7 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
             this.next = sequentialNext;
             sequentialNext.prev = this;
             if (this.output == null) {
-                this.output = new LinkedBlockingQueue<String>();
+                this.output = new LinkedBlockingQueue<>();
             }
             sequentialNext.input = this.output;
         } else {
@@ -41,7 +38,7 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
 
     public void process() throws InterruptedException {
         while (!isDone()) {
-            String line = input.take();
+            line = input.take();
             String processedLine = processLine(line);
             if (processedLine != null) {
                 output.put(processedLine);
@@ -51,11 +48,7 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
     }
 
     public boolean isDone() {
-        if (input.peek() != null) {
-            System.out.println(this.getClass().getName() + input.peek().equals(POISON_PILL));
-            return input.peek().equals(POISON_PILL);
-        }
-        return false;
+    	return line.equals(POISON_PILL);
     }
 
     protected abstract String processLine(String line);
