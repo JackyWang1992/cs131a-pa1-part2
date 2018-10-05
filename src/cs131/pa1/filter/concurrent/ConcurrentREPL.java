@@ -22,12 +22,10 @@ public class ConcurrentREPL {
             } else if (!command.trim().equals("")) {
                 //building the filters list from the command
                 ConcurrentFilter filterlist = ConcurrentCommandBuilder.createFiltersFromCommand(command);
-//				System.out.println(filterlist.toString());
+
                 while (filterlist != null && filterlist.getNext() != null) {
                     Thread t = new Thread(filterlist);
                     t.start();
-//					System.out.println(t.toString());
-//					System.out.println(Thread.currentThread());
                     filterlist = (ConcurrentFilter) filterlist.getNext();
                 }
 
@@ -43,5 +41,4 @@ public class ConcurrentREPL {
         s.close();
         System.out.print(Message.GOODBYE);
     }
-
 }
