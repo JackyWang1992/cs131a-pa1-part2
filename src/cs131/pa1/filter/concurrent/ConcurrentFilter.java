@@ -11,6 +11,7 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
     protected LinkedBlockingQueue<String> output;
     protected static final String POISON_PILL = "END OF THREAD";
     protected String line = "";
+    protected Thread thread;
 
     @Override
     public void setPrevFilter(Filter prevFilter) {
@@ -59,5 +60,13 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setThread(Thread t){
+        thread = t;
+    }
+
+    public Thread getThread(){
+        return this.thread;
     }
 }
