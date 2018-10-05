@@ -2,8 +2,6 @@ package cs131.pa1.filter.concurrent;
 
 import cs131.pa1.filter.Message;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class ConcurrentREPL {
@@ -24,18 +22,20 @@ public class ConcurrentREPL {
             } else if (!command.trim().equals("")) {
                 //building the filters list from the command
                 ConcurrentFilter filterlist = ConcurrentCommandBuilder.createFiltersFromCommand(command);
-                ConcurrentFilter cur = filterlist;
 
-                while (cur != null && cur.getNext() != null) {
-                    Thread t = new Thread(cur);
+                while (filterlist != null && filterlist.getNext() != null) {
+                    Thread t = new Thread(filterlist);
                     t.start();
-                    cur = (ConcurrentFilter) cur.getNext();
-                    cur.setPrevThread(t);
+                    filterlist = (ConcurrentFilter) filterlist.getNext();
                 }
-                
-                Thread printThread = new Thread(cur);
-                printThread.start();
-                try {printThread.join();} catch (InterruptedException e ) {}
+
+                Thread th = new Thread(filterlist);
+                th.start();
+                try {
+                    th.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         s.close();

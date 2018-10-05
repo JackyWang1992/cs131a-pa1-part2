@@ -15,9 +15,10 @@ public class LsFilter extends ConcurrentFilter{
 	
 	@Override
 	public void process() throws InterruptedException {
-		while(!isDone() && counter < flist.length) {
-			output.put(processLine(""));
+		while(counter < flist.length) {
+			output.add(processLine(""));
 		}
+		output.put(POISON_PILL);
 	}
 	
 	@Override
@@ -25,11 +26,5 @@ public class LsFilter extends ConcurrentFilter{
 		return flist[counter++].getName();
 	}
 	
-	@Override
-	public boolean isDone() {
-		if (prevThread == null) {
-			return flist.length == 0;
-		}
-		return prevThread.isAlive() && flist.length ==0;
-	}
+	
 }

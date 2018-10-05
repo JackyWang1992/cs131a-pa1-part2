@@ -7,6 +7,7 @@ public class PwdFilter extends ConcurrentFilter {
 	
 	public void process() throws InterruptedException {
 		output.put(processLine(""));
+		output.put(POISON_PILL);
 	}
 	
 	public String processLine(String line) {

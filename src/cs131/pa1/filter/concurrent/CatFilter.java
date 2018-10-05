@@ -35,22 +35,30 @@ public class CatFilter extends ConcurrentFilter{
 		}
 	}
 
-	public void process() {
+	@Override
+	public void process() throws InterruptedException {
 		while(reader.hasNext()) {
 			String processedLine = processLine("");
 			if(processedLine == null) {
 				break;
 			}
-			output.add(processedLine);
+			output.put(processedLine);
 		}
 		reader.close();
+		output.put(POISON_PILL);
 	}
 
+	@Override
 	public String processLine(String line) {
 		if(reader.hasNextLine()) {
 			return reader.nextLine();
 		} else {
 			return null;
 		}
+	}
+	
+	@Override
+	public boolean isDone() {
+		return !reader.hasNext();
 	}
 }
