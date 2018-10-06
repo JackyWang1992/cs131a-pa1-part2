@@ -27,73 +27,60 @@ public class ConcurrentREPL {
             System.out.print(Message.NEWCOMMAND);
             command = s.nextLine();
 
-            if (command.equals("exit")) {
+            if (command.trim().equals("exit")) {
                 break;
             } else if (command.trim().endsWith("&")) {
                 bgJobs.add(command.trim());
-                String[] bgCmds = command.split("&");
-                String bgCmd = bgCmds[0];
+                String[] bgCommands = command.split("&");
 
-                ConcurrentFilter filterlist = ConcurrentCommandBuilder.createFiltersFromCommand(bgCmds[0]);
+                ConcurrentFilter filterlist = ConcurrentCommandBuilder.createFiltersFromCommand(bgCommands[0]);
                 bgFilters.add(filterlist);
 
-                while (filterlist != null && filterlist.getNext() != null) {
-                    Thread t = new Thread(filterlist);
-                    t.start();
-                    filterlist.setThread(t);
-                    filterlist = (ConcurrentFilter) filterlist.getNext();
-                }
+                filterlist = startCurrentFilter(filterlist, "bg");
                 lastFilters.add(filterlist);
-                Thread th = new Thread(filterlist);
-                th.start();
+
             } else if (command.trim().startsWith("kill")) {
                 kill(command);
             } else if (command.trim().equals("repl_jobs")) {
-              replJobs();
+                replJobs();
             } else if (!command.trim().equals("")) {
                 //building the filters list from the command
                 ConcurrentFilter filterlist = ConcurrentCommandBuilder.createFiltersFromCommand(command);
-                while (filterlist != null && filterlist.getNext() != null) {
-                    Thread t = new Thread(filterlist);
-                    t.start();
-                    filterlist.setThread(t);
-                    filterlist = (ConcurrentFilter) filterlist.getNext();
-                }
+                filterlist = startCurrentFilter(filterlist, "con");
 
-                Thread th = new Thread(filterlist);
-                th.start();
-                try {
-                    th.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
+
             }
         }
         s.close();
         System.out.print(Message.GOODBYE);
     }
 
-    public void runCommand(String commands){
-        ConcurrentFilter filterlist = ConcurrentCommandBuilder.createFiltersFromCommand(commands);
-        while (filterlist != null && filterlist.getNext() != null) {
-            Thread t = new Thread(filterlist);
+    private static ConcurrentFilter startCurrentFilter(ConcurrentFilter filter, String type) {
+        while (filter != null && filter.getNext() != null) {
+            Thread t = new Thread(filter);
             t.start();
-            filterlist = (ConcurrentFilter) filterlist.getNext();
+            filter.setThread(t);
+            filter = (ConcurrentFilter) filter.getNext();
         }
-    }
-
-    public void joinLastFilter(ConcurrentFilter lastfilter) {
-        Thread th = new Thread(lastfilter);
+        Thread th = new Thread(filter);
         th.start();
-        try {
-            th.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (filter != null ){
+            filter.setThread(th);
         }
+        //if it's normal concurrent filters, let the last filter join.
+        if (type.equals("con")) {
+            try {
+                th.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return filter;
     }
 
     public static boolean kill(String command) {
-        int kindex;
+        int kindex = 0;
         String[] kcommands = command.split("\\s+");
         if (kcommands.length == 1) {
             System.out.printf(Message.REQUIRES_PARAMETER.toString(), command);
@@ -101,7 +88,7 @@ public class ConcurrentREPL {
         }
         try {
             kindex = Integer.parseInt(kcommands[1]);
-            if (kcommands.length > 2 || (kindex > bgJobs.size())){
+            if (kcommands.length > 2 || (kindex > bgJobs.size())) {
                 System.out.printf(Message.INVALID_PARAMETER.toString(), command);
                 return false;
             }
@@ -109,9 +96,10 @@ public class ConcurrentREPL {
             System.out.printf(Message.INVALID_PARAMETER.toString(), command);
             return false;
         }
+
         ConcurrentFilter curr = bgFilters.get(kindex - 1);
         while (curr != null) {
-            if (curr.getThread()!= null) {
+            if (curr.getThread() != null) {
                 curr.getThread().interrupt();
             }
             curr = (ConcurrentFilter) curr.getNext();
@@ -122,7 +110,7 @@ public class ConcurrentREPL {
 
     private static void replJobs() {
         for (int j = 0; j < lastFilters.size(); j++) {
-            if(lastFilters.get(j).getThread()!= null && !lastFilters.get(j).getThread().isAlive()) {
+            if (lastFilters.get(j).getThread() != null && !lastFilters.get(j).getThread().isAlive()) {
                 bgJobs.set(j, null);
             }
         }
