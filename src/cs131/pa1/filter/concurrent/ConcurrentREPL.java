@@ -46,6 +46,7 @@ public class ConcurrentREPL {
                 lastFilters.add(filterlist);
                 Thread th = new Thread(filterlist);
                 th.start();
+                filterlist.setThread(th);
             } else if (command.trim().startsWith("kill")) {
                 kill(command);
             } else if (command.trim().equals("repl_jobs")) {
