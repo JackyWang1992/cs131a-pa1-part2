@@ -9,54 +9,66 @@ import java.util.Scanner;
 public class ConcurrentREPL {
 
     static String currentWorkingDirectory;
-    static List<String> bgJobs;
-    static List<ConcurrentFilter> bgFilters;
-    static List<ConcurrentFilter> lastFilters;
+    private static List<String> bgJobs;
+    private static List<ConcurrentFilter> bgFilters;
+    //the list of last filters which help us to check whether background jobs are finished
+    private static List<ConcurrentFilter> lastFilters;
 
     public static void main(String[] args) {
-        currentWorkingDirectory = System.getProperty("user.dir");
-        bgJobs = new ArrayList<>();
-        bgFilters = new ArrayList<>();
-        lastFilters = new ArrayList<>();
+        init();
         Scanner s = new Scanner(System.in);
-        System.out.print(Message.WELCOME);
         String command;
 
         while (true) {
             //obtaining the command from the user
             System.out.print(Message.NEWCOMMAND);
-            command = s.nextLine();
+            command = s.nextLine().trim();
 
-            if (command.trim().equals("exit")) {
+            if (command.equals("exit")) {
                 break;
-            } else if (command.trim().endsWith("&")) {
-                bgJobs.add(command.trim());
-                String[] bgCommands = command.split("&");
-
-                ConcurrentFilter filterlist = ConcurrentCommandBuilder.createFiltersFromCommand(bgCommands[0]);
-                bgFilters.add(filterlist);
-
-                filterlist = startCurrentFilter(filterlist, "bg");
-                lastFilters.add(filterlist);
-
-            } else if (command.trim().startsWith("kill")) {
+            } else if (command.endsWith("&")) {
+                addBgJobs(command);
+            } else if (command.startsWith("kill")) {
                 kill(command);
-            } else if (command.trim().equals("repl_jobs")) {
+            } else if (command.equals("repl_jobs")) {
                 replJobs();
-            } else if (!command.trim().equals("")) {
+            } else if (!command.equals("")) {
                 //building the filters list from the command
-                ConcurrentFilter filterlist = ConcurrentCommandBuilder.createFiltersFromCommand(command);
-                filterlist = startCurrentFilter(filterlist, "con");
-
-
-
+                ConcurrentFilter filterList = ConcurrentCommandBuilder.createFiltersFromCommand(command);
+                filterList = startCurrentFilter(filterList);
+                //since it's normal concurrent filters, let the last filter join.
+                try {
+                    if (filterList != null) {
+                        filterList.getThread().join();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         s.close();
         System.out.print(Message.GOODBYE);
     }
 
-    private static ConcurrentFilter startCurrentFilter(ConcurrentFilter filter, String type) {
+    private static void init() {
+        currentWorkingDirectory = System.getProperty("user.dir");
+        bgJobs = new ArrayList<>();
+        bgFilters = new ArrayList<>();
+        lastFilters = new ArrayList<>();
+        System.out.print(Message.WELCOME);
+    }
+
+    private static void addBgJobs(String command) {
+        //add background job to background jobs list
+        bgJobs.add(command);
+        String[] bgCommands = command.split("&");
+        ConcurrentFilter filterList = ConcurrentCommandBuilder.createFiltersFromCommand(bgCommands[0]);
+        bgFilters.add(filterList);
+        filterList = startCurrentFilter(filterList);
+        lastFilters.add(filterList);
+    }
+
+    private static ConcurrentFilter startCurrentFilter(ConcurrentFilter filter) {
         while (filter != null && filter.getNext() != null) {
             Thread t = new Thread(filter);
             t.start();
@@ -68,44 +80,35 @@ public class ConcurrentREPL {
         if (filter != null ){
             filter.setThread(th);
         }
-        //if it's normal concurrent filters, let the last filter join.
-        if (type.equals("con")) {
-            try {
-                th.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         return filter;
     }
 
-    public static boolean kill(String command) {
-        int kindex = 0;
-        String[] kcommands = command.split("\\s+");
-        if (kcommands.length == 1) {
+    private static void kill(String command) {
+        int index;
+        String[] commandsToKill = command.split("\\s+");
+        if (commandsToKill.length == 1) {
             System.out.printf(Message.REQUIRES_PARAMETER.toString(), command);
-            return false;
+            return;
         }
         try {
-            kindex = Integer.parseInt(kcommands[1]);
-            if (kcommands.length > 2 || (kindex > bgJobs.size())) {
+            index = Integer.parseInt(commandsToKill[1]);
+            if (commandsToKill.length > 2 || (index > bgJobs.size())) {
                 System.out.printf(Message.INVALID_PARAMETER.toString(), command);
-                return false;
+                return;
             }
         } catch (NumberFormatException e) {
             System.out.printf(Message.INVALID_PARAMETER.toString(), command);
-            return false;
+            return;
         }
 
-        ConcurrentFilter curr = bgFilters.get(kindex - 1);
+        ConcurrentFilter curr = bgFilters.get(index - 1);
         while (curr != null) {
             if (curr.getThread() != null) {
                 curr.getThread().interrupt();
             }
             curr = (ConcurrentFilter) curr.getNext();
         }
-        bgJobs.set(kindex - 1, null);
-        return true;
+        bgJobs.set(index - 1, null);
     }
 
     private static void replJobs() {
@@ -120,5 +123,4 @@ public class ConcurrentREPL {
             }
         }
     }
-
 }

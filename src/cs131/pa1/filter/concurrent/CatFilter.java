@@ -9,9 +9,8 @@ import cs131.pa1.filter.Message;
 public class CatFilter extends ConcurrentFilter{
 	private Scanner reader;
 	
-	public CatFilter(String line) throws Exception {
+	CatFilter(String line) throws Exception {
 		super();
-		
 		//parsing the cat options
 		String[] args = line.split(" ");
 		String filename;

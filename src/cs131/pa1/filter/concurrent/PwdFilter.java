@@ -1,7 +1,7 @@
 package cs131.pa1.filter.concurrent;
 
 public class PwdFilter extends ConcurrentFilter {
-	public PwdFilter() {
+	PwdFilter() {
 		super();
 	}
 	

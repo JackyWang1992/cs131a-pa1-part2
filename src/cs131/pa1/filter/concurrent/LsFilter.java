@@ -6,7 +6,7 @@ public class LsFilter extends ConcurrentFilter{
 	File folder;
 	File[] flist;
 	
-	public LsFilter() {
+	LsFilter() {
 		super();
 		counter = 0;
 		folder = new File(ConcurrentREPL.currentWorkingDirectory);
@@ -25,6 +25,4 @@ public class LsFilter extends ConcurrentFilter{
 	public String processLine(String line) {
 		return flist[counter++].getName();
 	}
-	
-	
 }

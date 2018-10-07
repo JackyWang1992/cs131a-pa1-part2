@@ -3,7 +3,7 @@ package cs131.pa1.filter.concurrent;
 
 public class PrintFilter extends ConcurrentFilter {
     private String line = "";
-    public PrintFilter() {
+    PrintFilter() {
         super();
     }
 
@@ -23,5 +23,4 @@ public class PrintFilter extends ConcurrentFilter {
     public boolean isDone() {
         return line.equals(POISON_PILL);
     }
-
 }

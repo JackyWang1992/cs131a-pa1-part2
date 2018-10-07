@@ -11,7 +11,7 @@ public class RedirectFilter extends ConcurrentFilter {
 	private FileWriter fw;
 	private String line = "";
 
-	public RedirectFilter(String line) throws Exception {
+	RedirectFilter(String line) throws Exception {
 		super();
 		String[] param = line.split(">");
 		if(param.length > 1) {
@@ -47,7 +47,7 @@ public class RedirectFilter extends ConcurrentFilter {
 	
 	public String processLine(String line) {
 		try {
-			fw.append(line + "\n");
+			fw.append(line).append("\n");
 		} catch (IOException e) {
 			System.out.printf(Message.FILE_NOT_FOUND.toString(), line);
 		}

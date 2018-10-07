@@ -5,7 +5,7 @@ public class WcFilter extends ConcurrentFilter {
 	private int wordcount;
 	private int charcount;
 
-	public WcFilter() {
+	WcFilter() {
 		super();
 	}
 	

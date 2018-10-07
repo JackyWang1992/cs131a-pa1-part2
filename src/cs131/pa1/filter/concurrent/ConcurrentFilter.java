@@ -7,11 +7,12 @@ import cs131.pa1.filter.Filter;
 
 public abstract class ConcurrentFilter extends Filter implements Runnable {
 
-    protected LinkedBlockingQueue<String> input;
-    protected LinkedBlockingQueue<String> output;
-    protected static final String POISON_PILL = "END OF THREAD";
-    protected String line = "";
-    protected Thread thread;
+    LinkedBlockingQueue<String> input;
+    LinkedBlockingQueue<String> output;
+    //the string which denote the previous thread is done
+    static final String POISON_PILL = "END OF THREAD";
+    String line = "";
+    private Thread thread;
 
     @Override
     public void setPrevFilter(Filter prevFilter) {
@@ -33,7 +34,7 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
         }
     }
 
-    public Filter getNext() {
+    Filter getNext() {
         return next;
     }
 
@@ -45,6 +46,7 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
                 output.put(processedLine);
             }
         }
+        //when process finished, put poison pill at last
         output.put(POISON_PILL);
     }
 
@@ -62,11 +64,11 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
         }
     }
 
-    public void setThread(Thread t){
+    void setThread(Thread t){
         thread = t;
     }
 
-    public Thread getThread(){
+    Thread getThread(){
         return this.thread;
     }
 }

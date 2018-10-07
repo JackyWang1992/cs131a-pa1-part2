@@ -6,40 +6,40 @@ import java.util.List;
 
 import cs131.pa1.filter.Message;
 
-public class ConcurrentCommandBuilder {
+class ConcurrentCommandBuilder {
 	
-	public static ConcurrentFilter createFiltersFromCommand(String command){
+	static ConcurrentFilter createFiltersFromCommand(String command){
 		//initialize the list that will hold all of the filters
-				List<ConcurrentFilter> filters = new LinkedList<ConcurrentFilter>();
-				//adding whitespace so that string splitting doesn't bug
-				command = " " + command + " ";
-				//removing the final filter here
-				String truncCommand = adjustCommandToRemoveFinalFilter(command);
-				if(truncCommand == null) {
-					return null;
-				}
-				//for all the commands, split them by pipes, construct each filter, and add them to the filters list.
-				String[] commands = truncCommand.split("\\|");
-				for(int i = 0; i < commands.length; i++) {
-					ConcurrentFilter filter = constructFilterFromSubCommand(commands[i].trim());
-					if(filter != null) {
-						filters.add(filter);
-					} else {
-						return null;
-					}
-				}
+		List<ConcurrentFilter> filters = new LinkedList<ConcurrentFilter>();
+		//adding whitespace so that string splitting doesn't bug
+		command = " " + command + " ";
+		//removing the final filter here
+		String truncCommand = adjustCommandToRemoveFinalFilter(command);
+		if(truncCommand == null) {
+			return null;
+		}
+		//for all the commands, split them by pipes, construct each filter, and add them to the filters list.
+		String[] commands = truncCommand.split("\\|");
+		for (String command1 : commands) {
+			ConcurrentFilter filter = constructFilterFromSubCommand(command1.trim());
+			if (filter != null) {
+				filters.add(filter);
+			} else {
+				return null;
+			}
+		}
 				
-				ConcurrentFilter fin = determineFinalFilter(command);
-				if(fin == null) {
-					return null;
-				}
-				filters.add(fin);
-				
-				if(linkFilters(filters, command) == true){
-					return filters.get(0);
-				} else {
-					return null;
-				}
+		ConcurrentFilter fin = determineFinalFilter(command);
+		if(fin == null) {
+			return null;
+		}
+		filters.add(fin);
+
+		if(linkFilters(filters, command)){
+			return filters.get(0);
+		} else {
+			return null;
+		}
 	}
 	
 	private static ConcurrentFilter determineFinalFilter(String command){

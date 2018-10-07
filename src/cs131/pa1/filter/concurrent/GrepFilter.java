@@ -17,10 +17,8 @@ public class GrepFilter extends ConcurrentFilter {
     }
 
     public String processLine(String line) {
-        if (!line.equals(POISON_PILL)) {
-            if (line.contains(toFind)) {
-                return line;
-            }
+        if (line.contains(toFind)) {
+            return line;
         }
         return null;
     }
