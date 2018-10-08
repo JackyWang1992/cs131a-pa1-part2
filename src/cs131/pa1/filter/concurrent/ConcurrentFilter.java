@@ -12,6 +12,7 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
     //the string which denote the previous thread is done
     static final String POISON_PILL = "END OF THREAD";
     String line = "";
+    //private field that record the specific thread of this filter
     private Thread thread;
 
     @Override

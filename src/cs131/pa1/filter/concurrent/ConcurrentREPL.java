@@ -10,6 +10,7 @@ public class ConcurrentREPL {
 
     static String currentWorkingDirectory;
     private static List<String> bgJobs;
+    //list that help us to kill commands
     private static List<ConcurrentFilter> bgFilters;
     //the list of last filters which help us to check whether background jobs are finished
     private static List<ConcurrentFilter> lastFilters;
@@ -51,6 +52,7 @@ public class ConcurrentREPL {
     }
 
     private static void init() {
+        //initialize all the objects used in this project
         currentWorkingDirectory = System.getProperty("user.dir");
         bgJobs = new ArrayList<>();
         bgFilters = new ArrayList<>();
@@ -63,12 +65,16 @@ public class ConcurrentREPL {
         bgJobs.add(command);
         String[] bgCommands = command.split("&");
         ConcurrentFilter filterList = ConcurrentCommandBuilder.createFiltersFromCommand(bgCommands[0]);
+        //add the first filter of one line of commands to the background filters list in order to track
         bgFilters.add(filterList);
         filterList = startCurrentFilter(filterList);
+        //add the last filter of one line of commands to the background filters
+        // list to track whether the command is finished or not
         lastFilters.add(filterList);
     }
 
     private static ConcurrentFilter startCurrentFilter(ConcurrentFilter filter) {
+        //actual start of the concurrent thread
         while (filter != null && filter.getNext() != null) {
             Thread t = new Thread(filter);
             t.start();
@@ -84,6 +90,7 @@ public class ConcurrentREPL {
     }
 
     private static void kill(String command) {
+        //kill commands that are still running by interrupt the threads of filters.
         int index;
         String[] commandsToKill = command.split("\\s+");
         if (commandsToKill.length == 1) {
@@ -112,6 +119,7 @@ public class ConcurrentREPL {
     }
 
     private static void replJobs() {
+        //to know how to print the running jobs, if the job is finished, it will automatically be deleted.
         for (int j = 0; j < lastFilters.size(); j++) {
             if (lastFilters.get(j).getThread() != null && !lastFilters.get(j).getThread().isAlive()) {
                 bgJobs.set(j, null);
