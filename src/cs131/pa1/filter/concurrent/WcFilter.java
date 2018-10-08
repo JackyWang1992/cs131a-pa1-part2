@@ -30,4 +30,10 @@ public class WcFilter extends ConcurrentFilter {
 			return null;
 		}
 	}
+	
+	@Override
+	//to not count for the poison pill
+	public boolean isDone() {
+		return line.equals(POISON_PILL);
+	}
 }

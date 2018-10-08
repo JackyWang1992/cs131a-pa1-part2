@@ -56,8 +56,4 @@ public class CatFilter extends ConcurrentFilter{
 		}
 	}
 	
-	@Override
-	public boolean isDone() {
-		return !reader.hasNext();
-	}
 }

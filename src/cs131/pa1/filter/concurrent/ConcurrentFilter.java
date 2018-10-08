@@ -51,8 +51,10 @@ public abstract class ConcurrentFilter extends Filter implements Runnable {
         output.put(POISON_PILL);
     }
 
+    //to check both whether the previous filter is done
+    //and the input queue is empty.
     public boolean isDone() {
-    	return line.equals(POISON_PILL);
+    	return line.equals(POISON_PILL) && input.isEmpty();
     }
 
     protected abstract String processLine(String line);
