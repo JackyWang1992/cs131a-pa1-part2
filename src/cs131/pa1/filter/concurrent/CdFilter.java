@@ -8,7 +8,7 @@ import cs131.pa1.filter.Message;
 public class CdFilter extends ConcurrentFilter {
 	private String dirToSet;
 	
-	public CdFilter(String line) throws Exception {
+	CdFilter(String line) throws Exception {
 		super();
 		dirToSet = ConcurrentREPL.currentWorkingDirectory;
 		String[] args = line.trim().split(" ");
@@ -33,8 +33,9 @@ public class CdFilter extends ConcurrentFilter {
 		}
 	}
 	
-	public void process() {
+	public void process() throws InterruptedException {
 		processLine("");
+		output.put(POISON_PILL);
 	}
 	
 	public String processLine(String line) {

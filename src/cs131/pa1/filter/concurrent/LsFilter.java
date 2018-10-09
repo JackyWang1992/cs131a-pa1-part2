@@ -6,7 +6,7 @@ public class LsFilter extends ConcurrentFilter{
 	File folder;
 	File[] flist;
 	
-	public LsFilter() {
+	LsFilter() {
 		super();
 		counter = 0;
 		folder = new File(ConcurrentREPL.currentWorkingDirectory);
@@ -14,10 +14,11 @@ public class LsFilter extends ConcurrentFilter{
 	}
 	
 	@Override
-	public void process() {
+	public void process() throws InterruptedException {
 		while(counter < flist.length) {
 			output.add(processLine(""));
 		}
+		output.put(POISON_PILL);
 	}
 	
 	@Override

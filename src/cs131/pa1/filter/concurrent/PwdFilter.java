@@ -1,12 +1,13 @@
 package cs131.pa1.filter.concurrent;
 
 public class PwdFilter extends ConcurrentFilter {
-	public PwdFilter() {
+	PwdFilter() {
 		super();
 	}
 	
-	public void process() {
-		output.add(processLine(""));
+	public void process() throws InterruptedException {
+		output.put(processLine(""));
+		output.put(POISON_PILL);
 	}
 	
 	public String processLine(String line) {
